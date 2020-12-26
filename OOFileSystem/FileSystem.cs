@@ -30,11 +30,15 @@ namespace OOFileSystem
                     throw new Exception("Path already exists");
                 }
             }
+            if (parent.Type == "Text files")
+            {
+                throw new Exception("Illegal File System Operation");
+            }
             parent.Entities.Add(child);
             child.Parent = parent;
         }
 
-        public Entity TraverseFileSystem(string[] path)
+        private Entity TraverseFileSystem(string[] path)
         {
             Entity drive = null;
             //loop through the drives to find the drive that matches
@@ -114,11 +118,14 @@ namespace OOFileSystem
                     throw new Exception("Path already exists");
                 }
             }
-            Destination.Entities.Add(Source);
-            Source.Parent = Destination;
+
             Entity ToRemove = Source;
-            Entity SourceParent = Source.Parent;
+            Entity SourceParent = ToRemove.Parent;
             SourceParent.Entities.Remove(ToRemove);
+            Source.Parent = Destination;
+            Source.Path = Destination.Path + "\\" + Source.Name;
+            UpdateChildFilePath(Source);
+            Destination.Entities.Add(Source);
             UpdateEntitySize(SourceParent);
             UpdateEntitySize(Destination);
         }
@@ -139,10 +146,29 @@ namespace OOFileSystem
         public void UpdateEntitySize(Entity entity)
         {
             Entity temp = entity;
-            while (temp.Parent != null)
+            while (temp != null)
             {
                 temp.UpdateSize();
                 temp = temp.Parent;
+            }
+        }
+
+        public void UpdateChildFilePath(Entity entity)
+        {
+            Entity temp = entity;
+            Queue<List<Entity>> queue = new Queue<List<Entity>>();
+            queue.Enqueue(temp.Entities);
+            while (queue.Count != 0)
+            {
+                List<Entity> CurrentList = queue.Dequeue();
+                foreach (var ent in CurrentList)
+                {
+                    ent.UpdatePath();
+                    if (ent.Entities.Count != 0)
+                    {
+                        queue.Enqueue(ent.Entities);
+                    }
+                }
             }
         }
     }

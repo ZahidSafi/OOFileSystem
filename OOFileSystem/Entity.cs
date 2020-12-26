@@ -47,5 +47,9 @@ namespace OOFileSystem
                 Size = size;
             }
         }
+        public void UpdatePath()
+        {
+            this.Path = this.Parent.Path + "\\" + this.Name;
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace OOFileSystem
                     throw new Exception("Path already exists");
                 }
             }
-            if (parent.Type == "Text files")
+            if (parent.Type == "Text")
             {
                 throw new Exception("Illegal File System Operation");
             }
@@ -59,10 +59,6 @@ namespace OOFileSystem
             {
                 string EntityName = path[i];
                 bool EntityFound = false;
-                if (current.Type == "Text files" && current.Entities.Count != 0)
-                {
-                    throw new Exception("Illegal File System Operation");
-                }
                 foreach (var entity in current.Entities)
                 {
                     if (entity.Name == EntityName)
@@ -113,7 +109,7 @@ namespace OOFileSystem
             Entity Destination = TraverseFileSystem(dest);
             foreach (var entity in Destination.Entities)
             {
-                if (Source.Path == entity.Path)
+                if (Source.Name == entity.Name)
                 {
                     throw new Exception("Path already exists");
                 }
@@ -134,7 +130,7 @@ namespace OOFileSystem
         {
             string[] path = Path.Split('\\');
             Entity entity = TraverseFileSystem(path);
-            if (entity.Type != "Text files")
+            if (entity.Type != "Text")
             {
                 throw new Exception("Not a text file");
             }

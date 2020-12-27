@@ -18,7 +18,7 @@ namespace OOFileSystem
 
         public Entity(string type, string name, string path)
         {
-            if (type == "Drives")
+            if (type == "Drive")
             {
                 Parent = null;
             }
@@ -38,7 +38,7 @@ namespace OOFileSystem
 
                 size += entity.Size;
             }
-            if (this.Type == "Zip files")
+            if (this.Type == "Zip")
             {
                 Size = size / 2;
             }
@@ -51,5 +51,7 @@ namespace OOFileSystem
         {
             this.Path = this.Parent.Path + "\\" + this.Name;
         }
+
+      
     }
 }

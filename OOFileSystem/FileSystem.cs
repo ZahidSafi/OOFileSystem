@@ -9,6 +9,9 @@ namespace OOFileSystem
     {
         public static List<Entity> drives;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public FileSystem()
         {
             drives = new List<Entity>
@@ -16,7 +19,12 @@ namespace OOFileSystem
                 new Entity("Drives", "C:", "C:")
             };
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Type"></param>
+        /// <param name="Name"></param>
+        /// <param name="ParentPath"></param>
         public void Create(string Type, string Name, string ParentPath)
         {
             CheckFilePath(ParentPath);
@@ -38,6 +46,11 @@ namespace OOFileSystem
             child.Parent = parent;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private Entity TraverseFileSystem(string[] path)
         {
             Entity drive = null;
@@ -76,6 +89,13 @@ namespace OOFileSystem
             return current;
         }
 
+
+        /// <summary>
+        /// Iterate through the input path and make sure a drive 
+        /// is not a child entity and to make sure its the 
+        /// first entity in the path
+        /// </summary>
+        /// <param name="ParentPath">Input file path</param>
         public void CheckFilePath(string ParentPath)
         {
             string[] path = ParentPath.Split('\\');
@@ -92,6 +112,10 @@ namespace OOFileSystem
             }
         }
 
+        /// <summary>
+        /// Traverse the file path and remove the entity
+        /// </summary>
+        /// <param name="path">Location of entity to remove</param>
         public void Delete(string path)
         {
             string[] PathToRemove = path.Split('\\');
@@ -100,7 +124,13 @@ namespace OOFileSystem
             parent.Entities.Remove(ToRemove);
         }
 
-
+        /// <summary>
+        /// Traverse the file system to get both the destination 
+        /// and source entity, and move source to destination. 
+        /// Remove source entity from old file path once done.
+        /// </summary>
+        /// <param name="SourcePath">Location of entity to move</param>
+        /// <param name="DestinationPath">Location to store it</param>
         public void Move(string SourcePath, string DestinationPath)
         {
             string[] source = SourcePath.Split('\\');
@@ -109,6 +139,7 @@ namespace OOFileSystem
             Entity Destination = TraverseFileSystem(dest);
             foreach (var entity in Destination.Entities)
             {
+                //check if file path exists
                 if (Source.Name == entity.Name)
                 {
                     throw new Exception("Path already exists");
@@ -116,16 +147,28 @@ namespace OOFileSystem
             }
 
             Entity ToRemove = Source;
-            Entity SourceParent = ToRemove.Parent;
-            SourceParent.Entities.Remove(ToRemove);
+            Entity SourceParent = ToRemove.Parent;//store the parent
+            SourceParent.Entities.Remove(ToRemove);//remove the old source
+            /*from here add source to destination, and update 
+             * parents and path as needed
+            */
             Source.Parent = Destination;
             Source.Path = Destination.Path + "\\" + Source.Name;
             UpdateChildFilePath(Source);
             Destination.Entities.Add(Source);
+            /*
+             * Update the sizes after the move
+             */
             UpdateEntitySize(SourceParent);
             UpdateEntitySize(Destination);
         }
 
+
+        /// <summary>
+        /// Traverse the file system and write the content to the entity
+        /// </summary>
+        /// <param name="Path">File path for the entity</param>
+        /// <param name="Content">Text for the file</param>
         public void WriteToFile(string Path, string Content)
         {
             string[] path = Path.Split('\\');
@@ -139,6 +182,12 @@ namespace OOFileSystem
             UpdateEntitySize(entity.Parent);
         }
 
+
+        /// <summary>
+        /// Link list traversal and update the size of each entity 
+        /// along the way
+        /// </summary>
+        /// <param name="entity">The starting entity</param>
         public void UpdateEntitySize(Entity entity)
         {
             Entity temp = entity;
@@ -149,7 +198,12 @@ namespace OOFileSystem
             }
         }
 
-        public void UpdateChildFilePath(Entity entity)
+        /// <summary>
+        /// Start from "entity" and use a breadth first search to traverse all the children and update
+        /// all the file paths accordingly after a move.
+        /// </summary>
+        /// <param name="entity">starting entity for child entities</param>
+        private void UpdateChildFilePath(Entity entity)
         {
             Entity temp = entity;
             Queue<List<Entity>> queue = new Queue<List<Entity>>();

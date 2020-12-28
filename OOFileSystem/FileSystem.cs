@@ -21,7 +21,7 @@ namespace OOFileSystem
         }
         /// <summary>
         /// Create either a Drive, Folder, Zip or Text at the given parent path. 
-        /// If an empty string path is put in, and the type is "Drive" then we make it a drive
+        /// If an empty string path is put in, and the type is "Drive" then we make it a drive.
         /// </summary>
         /// <param name="Type">Type of the entity</param>
         /// <param name="Name">Name of the entity</param>
@@ -34,6 +34,7 @@ namespace OOFileSystem
             }
             else if (Type == "Drive" && ParentPath.Length != 0)
             {
+                //exception is thrown, as they are adding it as a child entity
                 throw new Exception("Illegal File System Operation");
             }
             else
@@ -50,6 +51,7 @@ namespace OOFileSystem
                 }
                 if (parent.Type == "Text")
                 {
+                    //throw exception, if adding as a child of a text file
                     throw new Exception("Illegal File System Operation");
                 }
                 parent.Entities.Add(child);
@@ -58,9 +60,9 @@ namespace OOFileSystem
         }
 
         /// <summary>
-        /// 
+        /// Traverse the file system to using the "path" to return the entity
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Location of the entity</param>
         /// <returns></returns>
         private Entity TraverseFileSystem(string[] path)
         {
@@ -78,6 +80,9 @@ namespace OOFileSystem
             {
                 throw new Exception("Path not found");
             }
+            /*from here traverse the rest of the file path
+             * and check to see if the entity name exists
+             */
             Entity current = drive;
             for (int i = 1; i < path.Length; i++)
             {
@@ -134,9 +139,14 @@ namespace OOFileSystem
                 }
             }
 
+            /*Here we want to store source, get its parent, 
+             * and then remove source from the parents list of 
+             * children
+            */
             Entity ToRemove = Source;
-            Entity SourceParent = ToRemove.Parent;//store the parent
-            SourceParent.Entities.Remove(ToRemove);//remove the old source
+            Entity SourceParent = ToRemove.Parent;
+            SourceParent.Entities.Remove(ToRemove);
+
             /*from here add source to destination, and update 
              * parents and path as needed
             */
@@ -173,7 +183,7 @@ namespace OOFileSystem
 
         /// <summary>
         /// Link list traversal and update the size of each entity 
-        /// along the way
+        /// all the way up to the drives
         /// </summary>
         /// <param name="entity">The starting entity</param>
         public void UpdateEntitySize(Entity entity)
@@ -201,6 +211,7 @@ namespace OOFileSystem
                 List<Entity> CurrentList = queue.Dequeue();
                 foreach (var ent in CurrentList)
                 {
+                    //iterate through and update the path, and add any children non empty children
                     ent.UpdatePath();
                     if (ent.Entities.Count != 0)
                     {

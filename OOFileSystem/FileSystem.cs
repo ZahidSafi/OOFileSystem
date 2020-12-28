@@ -20,30 +20,42 @@ namespace OOFileSystem
             };
         }
         /// <summary>
-        /// 
+        /// Create either a Drive, Folder, Zip or Text at the given parent path. 
+        /// If an empty string path is put in, and the type is "Drive" then we make it a drive
         /// </summary>
-        /// <param name="Type"></param>
-        /// <param name="Name"></param>
-        /// <param name="ParentPath"></param>
+        /// <param name="Type">Type of the entity</param>
+        /// <param name="Name">Name of the entity</param>
+        /// <param name="ParentPath">Location to create the entity</param>
         public void Create(string Type, string Name, string ParentPath)
         {
-            CheckFilePath(ParentPath);
-            string[] path = ParentPath.Split('\\');
-            Entity parent = TraverseFileSystem(path);
-            Entity child = new Entity(Type, Name, ParentPath + "\\" + Name);
-            foreach (var entity in parent.Entities)
+            if (Type == "Drive" && ParentPath.Length == 0)
             {
-                if (entity.Path == child.Path)
-                {
-                    throw new Exception("Path already exists");
-                }
+                drives.Add(new Entity(Type, Name, Name));
             }
-            if (parent.Type == "Text")
+            else if (Type == "Drive" && ParentPath.Length != 0)
             {
                 throw new Exception("Illegal File System Operation");
             }
-            parent.Entities.Add(child);
-            child.Parent = parent;
+            else
+            {
+                CheckFilePath(ParentPath);
+                string[] path = ParentPath.Split('\\');
+                Entity parent = TraverseFileSystem(path);
+                Entity child = new Entity(Type, Name, ParentPath + "\\" + Name);
+                foreach (var entity in parent.Entities)
+                {
+                    if (entity.Path == child.Path)
+                    {
+                        throw new Exception("Path already exists");
+                    }
+                }
+                if (parent.Type == "Text")
+                {
+                    throw new Exception("Illegal File System Operation");
+                }
+                parent.Entities.Add(child);
+                child.Parent = parent;
+            }
         }
 
         /// <summary>

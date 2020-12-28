@@ -15,6 +15,13 @@ namespace OOFileSystemUnitTest
             fileSystem.Create("Folder", "folder", "C:");
             Assert.IsTrue(true);
         }
+        [TestMethod]
+        public void TestCreateDrive()
+        {
+            FileSystem fileSystem = new FileSystem();
+            fileSystem.Create("Drive", "D:", "");
+            Assert.IsTrue(true);
+        }
 
         [TestMethod]
         public void TestCreateWithMultipleEntity()
@@ -269,6 +276,22 @@ namespace OOFileSystemUnitTest
             catch (Exception e)
             {
                 Assert.AreEqual(e.Message, "Path not found");
+            }
+
+        }
+        [TestMethod]
+        public void TestCreateDriveWithinAFolder()
+        {
+            try
+            {
+                FileSystem fileSystem = new FileSystem();
+                fileSystem.Create("Folder", "folder", "C:");
+                fileSystem.Create("Drive", "D:", "C:\\folder");
+                Assert.IsTrue(true);
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual(e.Message, "Illegal File System Operation");
             }
 
         }

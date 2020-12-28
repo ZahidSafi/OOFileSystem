@@ -38,7 +38,6 @@ namespace OOFileSystem
             }
             else
             {
-                CheckFilePath(ParentPath);
                 string[] path = ParentPath.Split('\\');
                 Entity parent = TraverseFileSystem(path);
                 Entity child = new Entity(Type, Name, ParentPath + "\\" + Name);
@@ -99,29 +98,6 @@ namespace OOFileSystem
                 }
             }
             return current;
-        }
-
-
-        /// <summary>
-        /// Iterate through the input path and make sure a drive 
-        /// is not a child entity and to make sure its the 
-        /// first entity in the path
-        /// </summary>
-        /// <param name="ParentPath">Input file path</param>
-        public void CheckFilePath(string ParentPath)
-        {
-            string[] path = ParentPath.Split('\\');
-            if (!Regex.IsMatch(path[0], "^[A-Z]:$"))
-            {
-                throw new Exception("Illegal File System Operation");
-            }
-            for (int i = 1; i < path.Length; i++)
-            {
-                if (Regex.IsMatch(path[i], "^[A-Z]:$"))
-                {
-                    throw new Exception("Illegal File System Operation");
-                }
-            }
         }
 
         /// <summary>

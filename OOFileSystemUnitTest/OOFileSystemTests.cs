@@ -146,38 +146,6 @@ namespace OOFileSystemUnitTest
 
         }
         [TestMethod]
-        public void TestCreateFileWithMissingDriverInFilePath()
-        {
-
-            try
-            {
-                FileSystem fileSystem = new FileSystem();
-                fileSystem.Create("Folder", "folder", "f2");
-                Assert.Fail();
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(e.Message, "Illegal File System Operation");
-            }
-
-        }
-        [TestMethod]
-        public void TestCreateFileWithDriveAsChild()
-        {
-
-            try
-            {
-                FileSystem fileSystem = new FileSystem();
-                fileSystem.Create("Folder", "folder", "C:\\C:");
-                Assert.Fail();
-            }
-            catch (Exception e)
-            {
-                Assert.AreEqual(e.Message, "Illegal File System Operation");
-            }
-
-        }
-        [TestMethod]
         public void TestCreateFileWithFileThatExist()
         {
 

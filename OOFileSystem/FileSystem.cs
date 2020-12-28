@@ -10,7 +10,7 @@ namespace OOFileSystem
         public static List<Entity> drives;
 
         /// <summary>
-        /// 
+        /// Initializes a file system with a starting "Drive" called C:
         /// </summary>
         public FileSystem()
         {
@@ -30,6 +30,13 @@ namespace OOFileSystem
         {
             if (Type == "Drive" && ParentPath.Length == 0)
             {
+                foreach(var drive in drives)
+                {
+                    if(drive.Name == Name)
+                    {
+                        throw new Exception("Path already exists");
+                    }
+                }
                 drives.Add(new Entity(Type, Name, Name));
             }
             else if (Type == "Drive" && ParentPath.Length != 0)

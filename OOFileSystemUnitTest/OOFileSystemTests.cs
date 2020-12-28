@@ -129,6 +129,7 @@ namespace OOFileSystemUnitTest
             Assert.IsTrue(true);
         }
 
+        /*Tests for exceptions being thrown*/
         [TestMethod]
         public void TestCreateFileWithInvalidFilePath()
         {
@@ -142,6 +143,22 @@ namespace OOFileSystemUnitTest
             catch (Exception e)
             {
                 Assert.AreEqual(e.Message, "Path not found");
+            }
+
+        }
+        [TestMethod]
+        public void TestCreateDuplicateDrive()
+        {
+
+            try
+            {
+                FileSystem fileSystem = new FileSystem();
+                fileSystem.Create("Drive", "C:", "");
+                Assert.Fail();
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual(e.Message, "Path already exists");
             }
 
         }

@@ -7,37 +7,37 @@ namespace OOFileSystem
 
     public class FileSystem
     {
-        public static List<Entity> drives;
+        public static Dictionary<string, Entity> drives;
 
         /// <summary>
         /// Initializes a file system with a starting "Drive" called C:
         /// </summary>
         public FileSystem()
         {
-            drives = new List<Entity>
+            drives = new Dictionary<string, Entity>
             {
-                new Entity("Drives", "C:", "C:")
+                { "C:", new Entity("Drive", "C:", "C:") }
             };
         }
         /// <summary>
         /// Create either a Drive, Folder, Zip or Text at the given parent path. 
         /// If an empty string path is put in, and the type is "Drive" then we make it a drive.
         /// </summary>
-        /// <param name="Type">Type of the entity</param>
-        /// <param name="Name">Name of the entity</param>
+        /// <param name="Type">Type of the entity to be created</param>
+        /// <param name="Name">Name of the entity to be created</param>
         /// <param name="ParentPath">Location to create the entity</param>
         public void Create(string Type, string Name, string ParentPath)
         {
             if (Type == "Drive" && ParentPath.Length == 0)
             {
-                foreach(var drive in drives)
+                if (drives.ContainsKey(Name))
                 {
-                    if(drive.Name == Name)
-                    {
-                        throw new Exception("Path already exists");
-                    }
+                    throw new Exception("Path already exists");
                 }
-                drives.Add(new Entity(Type, Name, Name));
+                else
+                {
+                    drives.Add(Name, new Entity(Type, Name, Name));
+                }
             }
             else if (Type == "Drive" && ParentPath.Length != 0)
             {
@@ -49,19 +49,18 @@ namespace OOFileSystem
                 string[] path = ParentPath.Split('\\');
                 Entity parent = TraverseFileSystem(path);
                 Entity child = new Entity(Type, Name, ParentPath + "\\" + Name);
-                foreach (var entity in parent.Entities)
+
+                //check if file exists already
+                if (parent.Entities.ContainsKey(child.Name))
                 {
-                    if (entity.Path == child.Path)
-                    {
-                        throw new Exception("Path already exists");
-                    }
+                    throw new Exception("Path already exists");
                 }
                 if (parent.Type == "Text")
                 {
                     //throw exception, if adding as a child of a text file
                     throw new Exception("Illegal File System Operation");
                 }
-                parent.Entities.Add(child);
+                parent.Entities.Add(child.Name, child);
                 child.Parent = parent;
             }
         }
@@ -73,17 +72,13 @@ namespace OOFileSystem
         /// <returns></returns>
         private Entity TraverseFileSystem(string[] path)
         {
-            Entity drive = null;
+            Entity drive;
             //loop through the drives to find the drive that matches
-            foreach (var d in drives)
+            if (drives.ContainsKey(path[0]))
             {
-                if (d.Name == path[0])
-                {
-                    drive = d;
-                    break;
-                }
+                drive = drives[path[0]];
             }
-            if (drive == null)
+            else
             {
                 throw new Exception("Path not found");
             }
@@ -94,17 +89,12 @@ namespace OOFileSystem
             for (int i = 1; i < path.Length; i++)
             {
                 string EntityName = path[i];
-                bool EntityFound = false;
-                foreach (var entity in current.Entities)
+                //check if path exists
+                if (current.Entities.ContainsKey(EntityName))
                 {
-                    if (entity.Name == EntityName)
-                    {
-                        current = entity;
-                        EntityFound = true;
-                        break;
-                    }
+                    current = current.Entities[EntityName];
                 }
-                if (EntityFound == false)
+                else
                 {
                     throw new Exception("Path not found");
                 }
@@ -121,7 +111,7 @@ namespace OOFileSystem
             string[] PathToRemove = path.Split('\\');
             Entity ToRemove = TraverseFileSystem(PathToRemove);
             Entity parent = ToRemove.Parent;
-            parent.Entities.Remove(ToRemove);
+            parent.Entities.Remove(ToRemove.Name);
         }
 
         /// <summary>
@@ -137,13 +127,9 @@ namespace OOFileSystem
             string[] dest = DestinationPath.Split('\\');
             Entity Source = TraverseFileSystem(source);
             Entity Destination = TraverseFileSystem(dest);
-            foreach (var entity in Destination.Entities)
+            if (Destination.Entities.ContainsKey(Source.Name))
             {
-                //check if file path exists
-                if (Source.Name == entity.Name)
-                {
-                    throw new Exception("Path already exists");
-                }
+                throw new Exception("Path already exists");
             }
 
             /*Here we want to store source, get its parent, 
@@ -152,7 +138,7 @@ namespace OOFileSystem
             */
             Entity ToRemove = Source;
             Entity SourceParent = ToRemove.Parent;
-            SourceParent.Entities.Remove(ToRemove);
+            SourceParent.Entities.Remove(ToRemove.Name);
 
             /*from here add source to destination, and update 
              * parents and path as needed
@@ -160,7 +146,7 @@ namespace OOFileSystem
             Source.Parent = Destination;
             Source.Path = Destination.Path + "\\" + Source.Name;
             UpdateChildFilePath(Source);
-            Destination.Entities.Add(Source);
+            Destination.Entities.Add(Source.Name, Source);
             /*
              * Update the sizes after the move
              */
@@ -211,18 +197,19 @@ namespace OOFileSystem
         private void UpdateChildFilePath(Entity entity)
         {
             Entity temp = entity;
-            Queue<List<Entity>> queue = new Queue<List<Entity>>();
+            Queue<Dictionary<string, Entity>> queue = new Queue<Dictionary<string, Entity>>();
             queue.Enqueue(temp.Entities);
             while (queue.Count != 0)
             {
-                List<Entity> CurrentList = queue.Dequeue();
-                foreach (var ent in CurrentList)
+                Dictionary<string, Entity> CurrentList = queue.Dequeue();
+                foreach (var key in CurrentList.Keys)
                 {
                     //iterate through and update the path, and add any children non empty children
-                    ent.UpdatePath();
-                    if (ent.Entities.Count != 0)
+                    Entity current = CurrentList[key];
+                    current.UpdatePath();
+                    if (current.Entities.Count != 0)
                     {
-                        queue.Enqueue(ent.Entities);
+                        queue.Enqueue(current.Entities);
                     }
                 }
             }

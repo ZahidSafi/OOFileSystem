@@ -116,6 +116,18 @@ namespace OOFileSystemUnitTest
             Assert.IsTrue(true);
         }
         [TestMethod]
+        public void TestWriteToFileWithNestedEntitiesAndMove()
+        {
+            FileSystem fileSystem = new FileSystem();
+            fileSystem.Create("Text", "txt", "C:");
+            fileSystem.WriteToFile("C:\\txt", "Hello World!");
+            fileSystem.Create("Folder", "folder", "C:");
+            fileSystem.Create("Text", "txt2", "C:\\folder");
+            fileSystem.WriteToFile("C:\\folder\\txt2", "This is a test!");
+            fileSystem.Move("C:\\txt", "C:\\folder");
+            Assert.IsTrue(true);
+        }
+        [TestMethod]
         public void TestWriteToFileWithZipFilesEntities()
         {
             FileSystem fileSystem = new FileSystem();
@@ -129,7 +141,7 @@ namespace OOFileSystemUnitTest
             Assert.IsTrue(true);
         }
 
-        /*Tests for exceptions being thrown*/
+        /*Tests for exceptions being thrown with correct message*/
         [TestMethod]
         public void TestCreateFileWithInvalidFilePath()
         {

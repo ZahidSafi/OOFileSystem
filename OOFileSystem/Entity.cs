@@ -34,7 +34,7 @@ namespace OOFileSystem
         /// <summary>
         /// List of "next" pointers to all available entities
         /// </summary>
-        public List<Entity> Entities { get; set; }
+        public Dictionary<string, Entity> Entities { get; set; }
 
 
         /// <summary>
@@ -42,6 +42,12 @@ namespace OOFileSystem
         /// </summary>
         public Entity Parent { get; set; }
 
+        /// <summary>
+        /// Initilizes an Entity that can be of Type: "Drive, Folder, Zip, or Text
+        /// </summary>
+        /// <param name="type">Type for the Entity</param>
+        /// <param name="name">Name  of the entity</param>
+        /// <param name="path">Location of the entity</param>
         public Entity(string type, string name, string path)
         {
             if (type == "Drive")
@@ -51,7 +57,7 @@ namespace OOFileSystem
             Type = type;
             Name = name;
             Path = path;
-            Entities = new List<Entity>();
+            Entities = new Dictionary<string, Entity>();
 
         }
 
@@ -63,10 +69,10 @@ namespace OOFileSystem
         public void UpdateSize()
         {
             int size = 0;
-            foreach (var entity in Entities)
+            foreach (var key in Entities.Keys)
             {
 
-                size += entity.Size;
+                size += Entities[key].Size;
             }
             if (this.Type == "Zip")
             {
@@ -86,6 +92,6 @@ namespace OOFileSystem
             this.Path = this.Parent.Path + "\\" + this.Name;
         }
 
-      
+
     }
 }
